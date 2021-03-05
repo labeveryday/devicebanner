@@ -8,19 +8,24 @@ from netmiko import ConnectHandler
 
 banner = open('./banners/cisco_devnet.txt')
 
-now = datetime.datetime.now()
 
-with open('ipaddress.txt', 'r') as file:
-    ip_list = []
-    for line in file:
-        ip_list.append(line.strip())
+def openFile():
+    with open('ipaddress.txt', 'r') as file:
+        ip_list = []
+        for line in file:
+            ip_list.append(line.strip())
+    return ip_list
 
+def get_date():
+    return datetime.datetime.now()
 
-def send_banner(ip, username=USERNAME, password=PASSWORD, device_type=DEVICE_TYPE):
+def login(ip, username=USERNAME, password=PASSWORD, device_type=DEVICE_TYPE):
+    return ConnectHandler(ip=ip, device_type=device_type, username=username, password=password)
+
+def send_banner(ip):
     if type(ip) == list:
         print(True)
     for i in ip:
-        ip = i.strip()
         net_connect = ConnectHandler(ip=ip, device_type=device_type, username=username, password=password)
         print('Connecting to %s' % ip)
         time.sleep(1)
