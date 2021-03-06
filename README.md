@@ -37,9 +37,9 @@ python3 -m venv venv
 
 A couple of things to note:
 
-1. Modify the `ip_address_file.txt` to update the list of ip addresses for the devices that you want to update.
+1. Modify the `ip_address_file.txt` file to update the list of ip addresses for the devices that you want to update.
 
-2. Modify the device credentials in the `credentials.py` file. These are the creds that will be used to log into your network device.
+2. Modify the device credentials in the `credentials.py` file. These are the creds that will be used to log into your network devices.
 
 3. In the `banners/` directory is where you store the banners that will be used to update your devices. If you want to use a different banner you will need to do two things.
 
