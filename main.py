@@ -11,6 +11,7 @@ from credentials import *
 from pathlib import Path
 from netmiko import ConnectHandler, ssh_exception
 from netmiko.ssh_exception import NetMikoTimeoutException, NetMikoAuthenticationException
+from tabulate import tabulate
 
 
 banner_path = Path('./banners/')
@@ -22,6 +23,8 @@ def main(banner_name='cisco_devnet.txt'):
     """
     Main function that executes all functions.
     """
+    connect_failed = []
+    connect_successful = []
     banner_file = banner_path / banner_name
     banner = openFile(banner_file)
     ip_list = openFile(ip_file).splitlines()
@@ -38,12 +41,16 @@ def main(banner_name='cisco_devnet.txt'):
                 print(f"{e}")
                 print("*" * 30 + "\n")
                 writer.writerow((ip,"failed",get_date()))
+                connect_failed.append(ip)
                 continue
             send_banner(banner, net_connect)
             save(net_connect)
             hostname = get_device_info(net_connect)['hostname']
             writer.writerow((ip, "success", get_date()))
+            connect_successful.append(ip)
             print(f"Banner was successfully added to {hostname} on {get_date()}\n")
+    print(tabulate([[len(connect_failed), "failed"], [len(connect_successful), "success"]],
+                    headers=["Number_of_Devices", "Status"], tablefmt="pretty"))
 
 def openFile(filename):
     """
@@ -107,4 +114,4 @@ def save(net_connect):
 if __name__ == "__main__":
     starttime = time.time()
     main()  # <--- Pass a new banner file name here
-    print(f"Time taken = {str(round(time.time() - starttime, 2))} seconds")
+    print(f"Total Time Taken: {str(round(time.time() - starttime, 2))} seconds")

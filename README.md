@@ -61,7 +61,7 @@ Now that you have everything installed and updated you can execute the script
 
 ```bash
 (venv) duan@ubuntu devicebanner$ python main.py
-Attempting to log into 192.168.23.143.....
+Attempting to log into 192.168.23.145.....
 ******************************
 TCP connection to device failed.
 
@@ -70,10 +70,18 @@ Common causes of this problem are:
 2. Wrong TCP port.
 3. Intermediate firewall blocking access.
 
-Device settings: cisco_ios 192.168.23.143:22
+Device settings: cisco_ios 192.168.23.145:22
 
 
 ******************************
+
++-------------------+---------+
+| Number_of_Devices | Status  |
++-------------------+---------+
+|         4         | failed  |
+|         0         | success |
++-------------------+---------+
+Total Time Taken: 20.03 seconds
 
 ```
 

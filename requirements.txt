@@ -10,5 +10,6 @@ PyNaCl==1.4.0
 pyserial==3.5
 scp==0.13.3
 six==1.15.0
+tabulate==0.8.9
 tenacity==6.3.1
 textfsm==1.1.0
