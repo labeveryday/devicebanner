@@ -1,51 +1,110 @@
-#! /usr/bin/env python3
-import sys
-sys.path.append('../')
+#! /usr/bin/env python
+# Script updates the motd banner on cisco devices
+# Uses banner from ./banners dir
+# Outputs results to results.csv file
+# Will run on linux and windows
 import time
 import datetime
+import csv
+# Import variables from credentials.py
 from credentials import *
-from netmiko import ConnectHandler
+from pathlib import Path
+from netmiko import ConnectHandler, ssh_exception
+from netmiko.ssh_exception import NetMikoTimeoutException, NetMikoAuthenticationException
 
-banner = open('./banners/cisco_devnet.txt')
 
+banner_path = Path('./banners/')
+local_path = Path('./')
+ip_file = local_path / 'ip_address_file.txt'
+results = local_path / 'results.csv'
 
-def openFile():
-    with open('ipaddress.txt', 'r') as file:
-        ip_list = []
-        for line in file:
-            ip_list.append(line.strip())
-    return ip_list
+def main(banner_name='cisco_devnet.txt'):
+    """
+    Main function that executes all functions.
+    """
+    banner_file = banner_path / banner_name
+    banner = openFile(banner_file)
+    ip_list = openFile(ip_file).splitlines()
+    header = ['device_ip', 'status', 'date/time']
+    with open(results, 'wt') as file:
+        writer = csv.writer(file)
+        writer.writerow(i for i in header) 
+        for ip in ip_list:
+            print(f"Attempting to log into {ip}.....")
+            try:
+                net_connect = connect(ip)
+            except (NetMikoTimeoutException, NetMikoAuthenticationException) as e:
+                print("*" * 30)
+                print(f"{e}")
+                print("*" * 30 + "\n")
+                writer.writerow((ip,"failed",get_date()))
+                continue
+            send_banner(banner, net_connect)
+            save(net_connect)
+            hostname = get_device_info(net_connect)['hostname']
+            writer.writerow((ip, "success", get_date()))
+            print(f"Banner was successfully added to {hostname} on {get_date()}\n")
+
+def openFile(filename):
+    """
+    OPEN a file, read and return the data
+        Args:
+            filename (str): file name of text doc
+        return: string data
+        rtype: str
+    """
+    with open(filename, 'r') as f:
+        filename = f.read()
+    return filename
 
 def get_date():
-    return datetime.datetime.now()
+    """
+    GET Current Date and Time
+        return: Date/time '03-05-2021 12:04'
+        rtype: str
+    """
+    return datetime.datetime.now().strftime('%m-%d-%Y %H:%M')
 
-def login(ip, username=USERNAME, password=PASSWORD, device_type=DEVICE_TYPE):
+def connect(ip, username=USERNAME, password=PASSWORD, device_type=DEVICE_TYPE):
+    """
+    CONNECT to a network device
+        Args:
+            ip (str): IP address of device
+            username (str): Device login username
+            password (str): Device login password
+            device_type (str): Device type i.e. 'cisco_ios'
+        return: netmiko ConnectHandler object
+        rtype: class (object)
+    """
     return ConnectHandler(ip=ip, device_type=device_type, username=username, password=password)
 
-def send_banner(ip):
-    if type(ip) == list:
-        print(True)
-    for i in ip:
-        net_connect = ConnectHandler(ip=ip, device_type=device_type, username=username, password=password)
-        print('Connecting to %s' % ip)
-        time.sleep(1)
-        device_hostname = net_connect.send_command('show run | include hostname')
-        hostname = device_hostname[9:]
-        device_serial = net_connect.send_command('show inventory | include PID')
-        time.sleep(1)
-        net_connect.write_channel('config t \n')
-        time.sleep(1)
-        net_connect.write_channel(str(banner.read()) + '\n')
-        time.sleep(3)
-        net_connect.write_channel('exit \n')
-        time.sleep(1)
-        net_connect.write_channel('wri mem \n')
-        time.sleep(2)
-        show_session = net_connect.read_channel()
-        print(show_session)
-        time.sleep(1)
- 
-    clock = now.strftime('%m-%d-%Y %H:%M')
-    output = [hostname, ip, device_serial, clock]
+def get_device_info(net_connect):
+    """
+    GET network device info
+        Args:
+            net_connect (object): Netmiko ConnectHandler object
+        return: Network device show version info
+        rtype: dict
+    """
+    return net_connect.send_command('show version', use_textfsm=True)[0]
 
-banner.close()
+def send_banner(banner, net_connect):
+    """
+    POST network device banner motd
+        Args:
+            banner (list): Banner command set list
+            net_connect (object): Netmiko ConnectHandler object
+        return: Network device show version info
+        rtype: None
+    """
+    net_connect.send_config_set(banner, cmd_verify=False)
+
+def save(net_connect):
+
+    net_connect.send_command("wri mem")
+
+
+if __name__ == "__main__":
+    starttime = time.time()
+    main()  # <--- Pass a new banner file name here
+    print(f"Time taken = {str(round(time.time() - starttime, 2))} seconds")
