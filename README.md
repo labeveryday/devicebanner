@@ -43,15 +43,15 @@ A couple of things to note:
 
 3. In the `banners/` directory is where you store the banners that will be used to update your devices. If you want to use a different banner you will need to do two things.
 
-- First create a new text banner file in the banners directory with the command line command `banner motd ^ENTER CODE HERE`
+    - First create a new text banner file in the banners directory with the command line command `banner motd ^ENTER CODE HERE`
 
-![banner](https://github.com/labeveryday/Notes/blob/main/images/banner.png)
+    ![banner](https://github.com/labeveryday/Notes/blob/main/images/banner.png)
 
-- Second you will need to enter the name of the file as an argument on line 109 of `main.py`
+    - Second you will need to enter the name of the file as an argument on line 109 of `main.py`
 
->NOTE: There is no need to enter the file path. Just the name of the file!
+    >NOTE: There is no need to enter the file path. Just the name of the file!
 
-![banner_arg](https://github.com/labeveryday/Notes/blob/main/images/banner_arg.png)
+    ![banner_arg](https://github.com/labeveryday/Notes/blob/main/images/banner_arg.png)
 
 ## Example: Script in action
 
