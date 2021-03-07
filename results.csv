@@ -1,10 +1,1 @@
 device_ip,status,reason,date/time
-192.168.23.142,success,,03-06-2021 10:42
-192.168.23.143,success,,03-06-2021 10:42
-192.168.23.144,success,,03-06-2021 10:42
-192.168.23.145,failed,ssh timeout,03-06-2021 10:42
-192.168.23.148,success,,03-06-2021 10:43
-192.168.23.149,failed,ssh timeout,03-06-2021 10:43
-192.168.23.150,failed,ssh timeout,03-06-2021 10:43
-192.168.23.151,failed,ssh timeout,03-06-2021 10:43
-192.168.23.153,failed,ssh timeout,03-06-2021 10:43

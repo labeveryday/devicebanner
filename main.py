@@ -3,14 +3,16 @@
 # Uses banner from ./banners dir
 # Outputs results to results.csv file
 # Will run on linux and windows
-import time
-import datetime
-import csv
+import argparse
 import contextlib
+import csv
+import datetime
 import io
+import time
 # Import variables from credentials.py
 from credentials import *
 from pathlib import Path
+from ciscoconfparse import CiscoConfParse
 from netmiko import ConnectHandler, ssh_exception
 from paramiko.ssh_exception import SSHException
 from tabulate import tabulate
@@ -23,12 +25,21 @@ results = local_path / 'results.csv'
 
 def main(banner_name='cisco_devnet.txt'):
     """
-    Main function that executes all functions.
+    POST Main function that updates devices with entered banner motd
+        Args:
+            banner_name (str): Banner file name (default: 'cisco_devnet.txt')
+        return: None
+        rtype: None
     """
-    connect_failed = []
-    connect_successful = []
+    failed_connection = []
+    successful_connection = []
     banner_file = banner_path / banner_name
-    banner = openfile(banner_file)
+    try:
+        banner = openfile(banner_file)
+    except FileNotFoundError as e:
+        print("\n***Try again!***")
+        print(f"No such file or directory: {banner_name}\n")
+        exit()
     ip_list = openfile(ip_file).splitlines()
     header = ["device_ip", "status", "reason", "date/time"]
     with open(results, 'wt') as file:
@@ -44,15 +55,21 @@ def main(banner_name='cisco_devnet.txt'):
                     save(net_connect)
                     hostname = get_device_info(net_connect)['hostname']
                     writer.writerow((ip, "success", None, get_date()))
-                    connect_successful.append(ip)
+                    successful_connection.append(ip)
                     print(f"✅ Banner was successfully added to {hostname} on {get_date()}\n")
-                except (ssh_exception.NetMikoTimeoutException, ssh_exception.NetMikoAuthenticationException,
-                        SSHException) as e:
+                except ssh_exception.NetMikoTimeoutException:
                     print(f"❌ SSH timeout attempt to {ip} on {get_date()}\n")
-                    writer.writerow((ip,"failed","ssh timeout", get_date()))
-                    connect_failed.append(ip)
-                    continue            
-    print(tabulate([[len(connect_failed), "failed"], [len(connect_successful), "success"]],
+                    writer.writerow((ip,"failed","SSH Timeout", get_date()))
+                    failed_connection.append(ip)
+                except ssh_exception.NetMikoAuthenticationException:
+                    print(f"❌ Bad username or password to {ip} on {get_date()}\n")
+                    writer.writerow((ip,"failed","Bad username or password", get_date()))
+                    failed_connection.append(ip)
+                except SSHException:
+                    print(f"❌ Unable to connect. Check network device SSH configuration to {ip} on {get_date()}\n")
+                    writer.writerow((ip,"failed","Unable to connect. Check network device SSH configuration", get_date()))
+                    failed_connection.append(ip)
+    print(tabulate([[len(failed_connection), "failed"], [len(successful_connection), "success"]],
                     headers=["Number_of_Devices", "Status"], tablefmt="pretty"))
 
 def openfile(filename):
@@ -99,6 +116,16 @@ def get_device_info(net_connect):
     """
     return net_connect.send_command('show version', use_textfsm=True)[0]
 
+def get_device_running_config(net_connect):
+    """
+    GET network device running configuration
+        Args:
+            net_connect (object): Netmiko ConnectHandler object
+        return: Network device running-config
+        rtype: str
+    """
+    return net_connect.send_command('show running-config')
+
 def send_banner(banner, net_connect):
     """
     POST network device banner motd
@@ -120,8 +147,24 @@ def save(net_connect):
     """
     net_connect.send_command("wri mem")
 
+def parse_config(config):
+    """
+    PARSE a cisco device configuration
+        Args:
+            config (str): Device configurations
+        return: configuration list 
+        rtype: list
+    """
+    return CiscoConfParse(config.splitlines(), syntax='ios')
 
 if __name__ == "__main__":
     starttime = time.time()
-    main()  # <--- Pass a new banner file name here
+    parser = argparse.ArgumentParser(description="Pass banner file name argument")
+    parser.add_argument("--banner", help="Optional argument to pass a new banner\
+                        from the ./banners directory. Example: 'legal_banner.txt'")
+    args = parser.parse_args()
+    if args.banner != None:
+        main(args.banner)
+    else:
+        main()
     print(f"\nTotal Time Taken: {str(round(time.time() - starttime, 2))} seconds\n")

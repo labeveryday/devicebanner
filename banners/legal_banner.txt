@@ -1,4 +1,4 @@
-banner motd ^
+banner motd $
 ****************************** NOTICE *******************************
 
 THIS TEST SYSTEM IS THE PRIVATE PROPERTY OF <YOUR NAME HERE>. USE OF THIS
@@ -28,4 +28,4 @@ SECURITY STAFF.
                  ||     ||
                  
 Credit: Notice written by Du'An Lightfoot @labeveryday
-^
+$

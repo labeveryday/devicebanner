@@ -33,6 +33,14 @@ python3 -m venv venv
 .\venv\Scripts\activate.bat
 ```
 
+## Install project requirements
+
+Once you have your virtual environment setup and activated you will need to install your python packages. One way to do this is by doing `pip install <python package>`. For this project use the example listed below. It will installed the required libraries and dependencies for this specific project.
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Before running the code
 
 A couple of things to note:
@@ -41,50 +49,60 @@ A couple of things to note:
 
 2. Modify the device credentials in the `credentials.py` file. In this file are the creds that will be used to log into your network devices.
 
-3. In the `banners/` directory is where we store the banners that will be used to update your devices. If you want to use a different banner you will need to do two things.
+3. In the `banners/` directory is where we store the banners that will be used to update your devices. If you want to use a different banner you will need to do two things. By default the script uses the `cisco_devnet.txt` file.
 
     - ***FIRST*** create a new text banner file in the banners directory with the command line argument `banner motd ^ENTER CODE INSIDE HERE^`
 
     ![banner](https://github.com/labeveryday/Notes/blob/main/images/banner.png)
 
-    - ***SECOND*** you will need to enter the name of the file as an argument on line 109 of `main.py`
+    - ***SECOND*** pass in the new file name as a command line argument `python main.py --banner <banner_name.txt>`
 
     >NOTE: There is no need to enter the file path. Just the name of the file!
 
-    ![banner_arg](https://github.com/labeveryday/Notes/blob/main/images/banner_arg.png)
+    ```bash
+    (venv) duan@ubuntu devicebanner$ python main.py -h
+    usage: main.py [-h] [--banner BANNER]
+
+    Pass banner file name argument
+
+    optional arguments:
+    -h, --help       show this help message and exit
+    --banner BANNER  Optional argument to pass a new banner from the ./banners
+                     directory. Example: 'legal_banner.txt'
+    ```
 
 ## Example: Script in action
 
-Now that you have everything installed and updated you can execute the script.
+Now that the required dependencies are installed and updated you can now execute the script.
 
 ```bash
 (venv) duan@ubuntu devicebanner$ python main.py
 Attempting to log into 192.168.23.142.....
-✅ Banner was successfully added to SW2-IOSv on 03-06-2021 10:32
+✅ Banner was successfully added to SW2-IOSv on 03-06-2021 18:38
 
 Attempting to log into 192.168.23.143.....
-✅ Banner was successfully added to SW3-IOSv on 03-06-2021 10:32
+✅ Banner was successfully added to SW3-IOSv on 03-06-2021 18:38
 
 Attempting to log into 192.168.23.144.....
-✅ Banner was successfully added to SW1-IOSv on 03-06-2021 10:32
+✅ Banner was successfully added to SW1-IOSv on 03-06-2021 18:38
 
 Attempting to log into 192.168.23.145.....
-❌ SSH timeout attempt to 192.168.23.145 on 03-06-2021 10:32
+❌ SSH timeout attempt to 192.168.23.145 on 03-06-2021 18:38
 
 Attempting to log into 192.168.23.148.....
-✅ Banner was successfully added to R1-iosv on 03-06-2021 10:32
+❌ Bad username or password to 192.168.23.148 on 03-06-2021 18:38
 
 Attempting to log into 192.168.23.149.....
-❌ SSH timeout attempt to 192.168.23.149 on 03-06-2021 10:32
+❌ SSH timeout attempt to 192.168.23.149 on 03-06-2021 18:38
 
 Attempting to log into 192.168.23.150.....
-❌ SSH timeout attempt to 192.168.23.150 on 03-06-2021 10:32
+✅ Banner was successfully added to R2-iosv on 03-06-2021 18:39
 
 Attempting to log into 192.168.23.151.....
-❌ SSH timeout attempt to 192.168.23.151 on 03-06-2021 10:32
+❌ SSH timeout attempt to 192.168.23.151 on 03-06-2021 18:39
 
 Attempting to log into 192.168.23.153.....
-❌ SSH timeout attempt to 192.168.23.153 on 03-06-2021 10:32
+❌ Unable to connect. Check network device SSH configuration to 192.168.23.153 on 03-06-2021 18:39
 
 +-------------------+---------+
 | Number_of_Devices | Status  |
@@ -92,7 +110,8 @@ Attempting to log into 192.168.23.153.....
 |         5         | failed  |
 |         4         | success |
 +-------------------+---------+
-Total Time Taken: 37.61 seconds
+
+Total Time Taken: 45.53 seconds
 
 ```
 
