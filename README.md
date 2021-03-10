@@ -114,8 +114,7 @@ Attempting to log into 192.168.23.153.....
 Total Time Taken: 45.53 seconds
 
 ```
-
-Once the script has been executed the results will begin to print to the screen. Once complete you can now verify the results in the `results.csv` file and on the network device.
+After the script completes you can now verify the results in the `results.csv` file and on the network device.
 
 **Banner results.csv**
 
@@ -131,7 +130,7 @@ This script is still in progress. The next phase will be to added device banner 
 
 Introverted Network Automation Engineer that is changing lives as a Developer Advocate for Cisco DevNet. Pythons scripts are delicious. Especially at 2am on a Saturday night.
 
-My hangouts:
+Contact Me:
 
 - [LinkedIn](https://www.linkedin.com/in/duanlightfoot/)
 
