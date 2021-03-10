@@ -9,8 +9,8 @@ This is a script that leverages the [netmiko library](https://pyneng.readthedocs
 To get started: Download the code and cd to the `devicebanner` directory
 
 ```bash
-git clone https://github.com/labeveryday/devicebanner
-cd device banner
+git clone https://github.com/labeveryday/devicebanner.git
+cd devicebanner
 ```
 
 ## Python Virtual Environment
