@@ -1,6 +1,6 @@
-# devicebanner
+# Devicebanner, update the banner motd on a network device
 
-This is a script that leverages the [netmiko library](https://pyneng.readthedocs.io/en/latest/book/18_ssh_telnet/netmiko.html) to update the banner motd on a network device. Once the device update has been attempted the update status is then output to the `results.csv` file. Use this script to learn the basics of python.
+This is a script that leverages the [netmiko library](https://pyneng.readthedocs.io/en/latest/book/18_ssh_telnet/netmiko.html) to update the banner motd on a network device. Once the device update has been attempted the update status is then output to the `results.csv` file. The credentials are pre-configured to access the [Cisco DevNet Always-On Sandbox](https://devnetsandbox.cisco.com/RM/Diagram/Index/e83cfd31-ade3-4e15-91d6-3118b867a0dd?diagramType=Topology). You can edit the variables in the `credentials.py` file. Use this script to learn the basics of python.
 
 > NOTE: This code will run on Linux, MAC and Windows
 
