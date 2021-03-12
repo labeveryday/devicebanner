@@ -20,20 +20,25 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+"""
+devicebanner
+This script is designed to update the
+banner message of the day on network devices.
+"""
 
 import argparse
 import contextlib
 import csv
 import datetime
 import io
+import sys
 import time
-# Import variables from credentials.py
-from credentials import *
 from pathlib import Path
-from ciscoconfparse import CiscoConfParse
 from netmiko import ConnectHandler, ssh_exception
 from paramiko.ssh_exception import SSHException
 from tabulate import tabulate
+# Import variables from credentials.py
+from .credentials import USERNAME, PASSWORD, DEVICE_TYPE
 
 
 banner_path = Path('./banners/')
@@ -54,15 +59,15 @@ def main(banner_name='cisco_devnet.txt'):
     banner_file = banner_path / banner_name
     try:
         banner = openfile(banner_file)
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         print("\n***Try again!***")
         print(f"No such file or directory: {banner_name}\n")
-        exit()
+        sys.exit()
     ip_list = openfile(ip_file).splitlines()
     header = ["device_ip", "status", "reason", "date/time"]
     with open(results, 'wt') as file:
         writer = csv.writer(file)
-        writer.writerow(i for i in header) 
+        writer.writerow(i for i in header)
         for ip in ip_list:
             print(f"Attempting to log into {ip}.....")
             # This is to redirect stderr if netmiko can't connect
@@ -84,8 +89,10 @@ def main(banner_name='cisco_devnet.txt'):
                     writer.writerow((ip,"failed","Bad username or password", get_date()))
                     failed_connection.append(ip)
                 except SSHException:
-                    print(f"❌ Unable to connect. Check network device SSH configuration to {ip} on {get_date()}\n")
-                    writer.writerow((ip,"failed","Unable to connect. Check network device SSH configuration", get_date()))
+                    print(f"❌ Unable to connect. Check network device \
+                        SSH configuration to {ip} on {get_date()}\n")
+                    writer.writerow((ip,"failed","Unable to connect. \
+                        Check network device SSH configuration", get_date()))
                     failed_connection.append(ip)
     print(tabulate([[len(failed_connection), "failed"], [len(successful_connection), "success"]],
                     headers=["Number_of_Devices", "Status"], tablefmt="pretty"))
@@ -165,23 +172,13 @@ def save(net_connect):
     """
     net_connect.send_command("wri mem")
 
-def parse_config(config):
-    """
-    PARSE a cisco device configuration
-        Args:
-            config (str): Device configurations
-        return: configuration list 
-        rtype: list
-    """
-    return CiscoConfParse(config.splitlines(), syntax='ios')
-
 if __name__ == "__main__":
     starttime = time.time()
     parser = argparse.ArgumentParser(description="Pass banner file name argument")
     parser.add_argument("--banner", help="Optional argument to pass a new banner\
                         from the ./banners directory. Example: 'legal_banner.txt'")
     args = parser.parse_args()
-    if args.banner != None:
+    if args.banner is not None:
         main(args.banner)
     else:
         main()
